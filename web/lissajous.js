@@ -26,7 +26,12 @@ async function drawLissajous(draw,
     var x = x_amp * Math.sin(x_freq * w + degrees_to_radians(x_phase)) + width / 2;
     var y = y_amp * Math.sin(y_freq * w + degrees_to_radians(y_phase)) + height / 2;
     if (i > 0) {
-      draw.line(x_prev, y_prev, x, y).stroke({width: 1, color: '#fff'});
+      let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', x_prev.toFixed(2));
+      line.setAttribute('y1', y_prev.toFixed(2));
+      line.setAttribute('x2', x.toFixed(2));
+      line.setAttribute('y2', y.toFixed(2));
+      draw.appendChild(line);
     }
     x_prev = x;
     y_prev = y;
@@ -38,11 +43,12 @@ window.addEventListener('DOMContentLoaded', function () {
   const options = document.getElementById('options');
   console.log('hi from DOMContentLoaded');
 
-  var draw = SVG().addTo('#drawing').size(resolution[0], resolution[1]);
+  var draw = document.createElementNS("http://www.w3.org/2000/svg",'svg');
+  drawing.appendChild(draw);
   drawLissajous(draw, 10, 14, 100);
 
   options.addEventListener('input', function() {
-    draw.clear();
+    draw.innerHTML = '';
     drawLissajous(draw,
                   document.getElementById('x_freq').value,
                   document.getElementById('y_freq').value,
@@ -70,7 +76,7 @@ window.addEventListener('DOMContentLoaded', function () {
       document.getElementById('x_phase').dispatchEvent(new Event('input'));
       document.getElementById('y_phase').value = y_phase;
       document.getElementById('y_phase').dispatchEvent(new Event('input'));
-      draw.clear();
+      draw.innerHTML = '';
       drawLissajous(draw,
                     document.getElementById('x_freq').value,
                     document.getElementById('y_freq').value,
