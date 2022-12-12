@@ -3,6 +3,7 @@
 console.log('hi from lissajous.js');
 
 var isMoving = false;
+var isRotating = true;
 
 function degrees_to_radians(degrees) {
   return degrees * Math.PI / 180;
@@ -57,16 +58,37 @@ window.addEventListener('DOMContentLoaded', function () {
                   document.getElementById('y_phase').value);
   });
 
-  drawing.addEventListener('mousedown' , function(e) {
+  function rotate() {
+    // rotates x phase on pageload and after doubleclick
+    if (isRotating) {
+      var x_phase = document.getElementById('x_phase').value;
+      x_phase = Number(x_phase) + 1;
+      if (x_phase >= 360) {
+        x_phase = 0;
+      }
+      document.getElementById('x_phase').value = x_phase;
+      document.getElementById('x_phase').dispatchEvent(new Event('input'));
+      options.dispatchEvent(new Event('input'));
+    }
+  }
+
+  const rotatorInterval = setInterval(rotate, 25);
+
+  function ondown(e) {
     isMoving = true;
-  });
+  }
 
-  drawing.addEventListener('mouseup' , function(e) {
+  function onup(e) {
     isMoving = false;
-  });
+  }
 
-  drawing.addEventListener('mousemove', function(e) {
+  function ondbl(e) {
+    isRotating = !isRotating;
+  }
+
+  function onmove(e) {
     if (isMoving) {
+      isRotating = false;
       var bounds = drawing.getBoundingClientRect();
       var x = e.clientX - bounds.left;
       var y = e.clientY - bounds.top;
@@ -84,5 +106,16 @@ window.addEventListener('DOMContentLoaded', function () {
                     x_phase,
                     y_phase);
     }
-  });
+  }
+
+  drawing.addEventListener('mousedown', ondown);
+  drawing.addEventListener('pointerdown', ondown);
+
+  drawing.addEventListener('mouseup', onup);
+  drawing.addEventListener('pointerup', onup);
+
+  drawing.addEventListener('mousemove', onmove);
+  drawing.addEventListener('pointermove', onmove);
+
+  drawing.addEventListener('dblclick', ondbl);
 });
