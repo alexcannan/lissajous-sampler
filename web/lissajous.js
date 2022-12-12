@@ -12,7 +12,6 @@ async function drawLissajous(draw,
                              samples,
                              x_phase=0,
                              y_phase=0) {
-  console.log('hi from drawLissajous');
   var x_prev;
   var y_prev;
   var width = 300;
@@ -39,7 +38,6 @@ window.addEventListener('DOMContentLoaded', function () {
 
   const options = document.getElementById('options');
   options.addEventListener('input', function() {
-    console.log('hi from options input');
     draw.clear();
     drawLissajous(draw,
                   document.getElementById('x_freq').value,

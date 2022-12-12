@@ -1,0 +1,22 @@
+output {
+    font-family: monospace;
+}
+
+label {
+    font-family: sans-serif;
+}
+
+#options {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    grid-gap: 1em;
+}
+
+#options label {
+    display: block;
+    text-align: right;
+}
+
+#options label::after {
+    content: ":";
+}
