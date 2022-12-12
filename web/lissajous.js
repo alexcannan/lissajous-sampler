@@ -2,7 +2,6 @@
 
 console.log('hi from lissajous.js');
 
-const resolution = [1000, 1000];
 var isMoving = false;
 
 function degrees_to_radians(degrees) {
@@ -17,8 +16,9 @@ async function drawLissajous(draw,
                              y_phase=0) {
   var x_prev;
   var y_prev;
-  var width = resolution[0];
-  var height = resolution[1];
+  var bounds = draw.getBoundingClientRect();
+  var width = bounds.width;
+  var height = bounds.height;
   var x_amp = width / 2 * 0.9;
   var y_amp = height / 2 * 0.9;
   for (var i = 0; i <= samples; i++) {
@@ -70,8 +70,8 @@ window.addEventListener('DOMContentLoaded', function () {
       var bounds = drawing.getBoundingClientRect();
       var x = e.clientX - bounds.left;
       var y = e.clientY - bounds.top;
-      var x_phase = (x / resolution[0]) * 360;
-      var y_phase = (y / resolution[1]) * 360;
+      var x_phase = (x / bounds.width) * 360;
+      var y_phase = (y / bounds.height) * 360;
       document.getElementById('x_phase').value = x_phase;
       document.getElementById('x_phase').dispatchEvent(new Event('input'));
       document.getElementById('y_phase').value = y_phase;
