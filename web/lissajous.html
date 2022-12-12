@@ -1,0 +1,24 @@
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="lissajous.js" type="text/javascript"></script>
+    <style src="lissajous.css" type="text/css"></style>
+    <title>Lissajous</title>
+  </head>
+  <body>
+    <div id="drawing"></div>
+    <div id="options">
+      <input type="range" id="x_freq" min="1" max="100" value="1" step="1">
+      <label for="x_freq">X Frequency</label>
+      <input type="range" id="y_freq" min="1" max="100" value="1" step="1">
+      <label for="y_freq">Y Frequency</label>
+      <input type="range" id="x_phase" min="0" max="360" value="0" step="1">
+      <label for="x_phase">X Phase</label>
+      <input type="range" id="y_phase" min="0" max="360" value="0" step="1">
+      <label for="y_phase">Y Phase</label>
+      <input type="range" id="samples" min="1" max="1000" value="100" step="10">
+      <label for="samples">Samples</label>
+    </div>
+  </body>
+</html>
