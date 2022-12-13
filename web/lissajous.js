@@ -32,29 +32,7 @@ async function drawLissajous(gl,
   var vertex_buffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-  gl.bindBuffer(gl.ARRAY_BUFFER, null);
-  var vertCode = `
-    attribute vec3 coordinates;
-    void main(void) {
-      gl_Position = vec4(coordinates, 1.0);
-      gl_PointSize = 10.0;
-    }`;
-  var vertShader = gl.createShader(gl.VERTEX_SHADER);
-  gl.shaderSource(vertShader, vertCode);
-  gl.compileShader(vertShader);
-  var fragCode = `
-    void main(void) {
-      gl_FragColor = vec4(1.0, 1.0, 1.0, 0.2);
-    }`;
-  var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-  gl.shaderSource(fragShader, fragCode);
-  gl.compileShader(fragShader);
-  var shaderProgram = gl.createProgram();
-  gl.attachShader(shaderProgram, vertShader);
-  gl.attachShader(shaderProgram, fragShader);
-  gl.linkProgram(shaderProgram);
-  gl.useProgram(shaderProgram);
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+  var shaderProgram = gl.getParameter(gl.CURRENT_PROGRAM);
   var coord = gl.getAttribLocation(shaderProgram, "coordinates");
   gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(coord);
@@ -79,6 +57,29 @@ window.addEventListener('DOMContentLoaded', function () {
   }
 
   console.log(gl.getParameter(gl.VERSION), gl.getParameter(gl.SHADING_LANGUAGE_VERSION));
+
+  // setup gl
+  var vertCode = `
+    attribute vec3 coordinates;
+    void main(void) {
+      gl_Position = vec4(coordinates, 1.0);
+      gl_PointSize = 10.0;
+    }`;
+  var vertShader = gl.createShader(gl.VERTEX_SHADER);
+  gl.shaderSource(vertShader, vertCode);
+  gl.compileShader(vertShader);
+  var fragCode = `
+    void main(void) {
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 0.2);
+    }`;
+  var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(fragShader, fragCode);
+  gl.compileShader(fragShader);
+  var shaderProgram = gl.createProgram();
+  gl.attachShader(shaderProgram, vertShader);
+  gl.attachShader(shaderProgram, fragShader);
+  gl.linkProgram(shaderProgram);
+  gl.useProgram(shaderProgram);
 
   drawLissajous(gl, 10, 14, 100);
 
@@ -107,7 +108,7 @@ window.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  const fps = 30;
+  const fps = 50;
   const rotatorInterval = setInterval(rotate, 1000/fps);
 
   function ondown(e) {
