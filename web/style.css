@@ -9,6 +9,13 @@ output {
 
 label {
     font-family: sans-serif;
+    white-space: nowrap;
+    float: left;
+}
+
+#glcanvas {
+    aspect-ratio: 1/1;
+    height: 100%;
 }
 
 #drawing {
@@ -29,12 +36,11 @@ svg {
 line {
     stroke: white;
     stroke-width: 2;
-    opacity: 0.5;
+    opacity: 0.9;
 }
 
 #options {
     display: grid;
-    grid-template-columns: max-content max-content;
     grid-gap: 1em;
     position: absolute;
     height: 20%;
@@ -47,5 +53,5 @@ line {
 }
 
 #options label::after {
-    content: ":";
+    content: ": ";
 }

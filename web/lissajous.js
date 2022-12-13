@@ -9,34 +9,57 @@ function degrees_to_radians(degrees) {
   return degrees * Math.PI / 180;
 }
 
-async function drawLissajous(draw,
+async function clearCanvas(gl) {
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT)
+}
+
+async function drawLissajous(gl,
                              x_freq,
                              y_freq,
                              samples,
                              x_phase=0,
                              y_phase=0) {
-  var x_prev;
-  var y_prev;
-  var bounds = draw.getBoundingClientRect();
-  var width = bounds.width;
-  var height = bounds.height;
-  var x_amp = width / 2 * 0.9;
-  var y_amp = height / 2 * 0.9;
+  var vertices = [];
   for (var i = 0; i <= samples; i++) {
     var w = (2 * Math.PI * i) / samples;
-    var x = x_amp * Math.sin(x_freq * w + degrees_to_radians(x_phase)) + width / 2;
-    var y = y_amp * Math.sin(y_freq * w + degrees_to_radians(y_phase)) + height / 2;
-    if (i > 0) {
-      let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.setAttribute('x1', x_prev.toFixed(2));
-      line.setAttribute('y1', y_prev.toFixed(2));
-      line.setAttribute('x2', x.toFixed(2));
-      line.setAttribute('y2', y.toFixed(2));
-      draw.appendChild(line);
-    }
-    x_prev = x;
-    y_prev = y;
+    var x = Math.sin(x_freq * w + degrees_to_radians(x_phase));
+    var y = Math.sin(y_freq * w + degrees_to_radians(y_phase));
+    vertices.push(x, y, 0)
   }
+  var width = gl.canvas.width;
+  var height = gl.canvas.height;
+  var vertex_buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+  var vertCode = `
+    attribute vec3 coordinates;
+    void main(void) {
+      gl_Position = vec4(coordinates, 1.0);
+      gl_PointSize = 10.0;
+    }`;
+  var vertShader = gl.createShader(gl.VERTEX_SHADER);
+  gl.shaderSource(vertShader, vertCode);
+  gl.compileShader(vertShader);
+  var fragCode = `
+    void main(void) {
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 0.2);
+    }`;
+  var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(fragShader, fragCode);
+  gl.compileShader(fragShader);
+  var shaderProgram = gl.createProgram();
+  gl.attachShader(shaderProgram, vertShader);
+  gl.attachShader(shaderProgram, fragShader);
+  gl.linkProgram(shaderProgram);
+  gl.useProgram(shaderProgram);
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+  var coord = gl.getAttribLocation(shaderProgram, "coordinates");
+  gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(coord);
+  gl.viewport(0, 0, width, height);
+  gl.drawArrays(gl.LINE_STRIP, 0, vertices.length / 3);
 };
 
 window.addEventListener('DOMContentLoaded', function () {
@@ -44,13 +67,24 @@ window.addEventListener('DOMContentLoaded', function () {
   const options = document.getElementById('options');
   console.log('hi from DOMContentLoaded');
 
-  var draw = document.createElementNS("http://www.w3.org/2000/svg",'svg');
-  drawing.appendChild(draw);
-  drawLissajous(draw, 10, 14, 100);
+  const glcanvas = document.getElementById('glcanvas');
+  var bounds = glcanvas.getBoundingClientRect();
+  glcanvas.width = bounds.width;
+  glcanvas.height = bounds.height;
+  const gl = glcanvas.getContext('webgl');
+
+  if (gl === null) {
+    alert("Unable to initialize WebGL. Your browser or machine may not support it.");
+    return;
+  }
+
+  console.log(gl.getParameter(gl.VERSION), gl.getParameter(gl.SHADING_LANGUAGE_VERSION));
+
+  drawLissajous(gl, 10, 14, 100);
 
   options.addEventListener('input', function() {
-    draw.innerHTML = '';
-    drawLissajous(draw,
+    clearCanvas(gl);
+    drawLissajous(gl,
                   document.getElementById('x_freq').value,
                   document.getElementById('y_freq').value,
                   document.getElementById('samples').value,
@@ -61,8 +95,9 @@ window.addEventListener('DOMContentLoaded', function () {
   function rotate() {
     // rotates x phase on pageload and after doubleclick
     if (isRotating) {
-      var x_phase = document.getElementById('x_phase').value;
-      x_phase = Number(x_phase) + 1;
+      const x_phase_input = document.getElementById('x_phase')
+      var x_phase = x_phase_input.value;
+      x_phase = Number(x_phase) + Number(x_phase_input.step);
       if (x_phase >= 360) {
         x_phase = 0;
       }
@@ -72,7 +107,8 @@ window.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  const rotatorInterval = setInterval(rotate, 25);
+  const fps = 30;
+  const rotatorInterval = setInterval(rotate, 1000/fps);
 
   function ondown(e) {
     isMoving = true;
@@ -98,8 +134,8 @@ window.addEventListener('DOMContentLoaded', function () {
       document.getElementById('x_phase').dispatchEvent(new Event('input'));
       document.getElementById('y_phase').value = y_phase;
       document.getElementById('y_phase').dispatchEvent(new Event('input'));
-      draw.innerHTML = '';
-      drawLissajous(draw,
+      clearCanvas(gl);
+      drawLissajous(gl,
                     document.getElementById('x_freq').value,
                     document.getElementById('y_freq').value,
                     document.getElementById('samples').value,
