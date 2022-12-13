@@ -9,9 +9,67 @@ function degrees_to_radians(degrees) {
   return degrees * Math.PI / 180;
 }
 
-async function clearCanvas(gl) {
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT)
+function blinkSpan(spanId) {
+  // given a span id, display for 1 second then fade
+  var span = document.getElementById(spanId);
+  var op = 1;
+  span.style.display = 'inline';
+  span.style.opacity = op;
+  var counter = 0;
+  var timer = setInterval(function() {
+    counter++;
+    if (counter <= 20) {
+      return;
+    }
+    if (op <= 0.01) {
+      clearInterval(timer);
+      span.style.display = 'none';
+    }
+    span.style.opacity = op;
+    span.style.filter = 'alpha(opacity=' + op * 100 + ")";
+    op -= op * 0.1;
+  }, 50);
+}
+
+function setInput(name, value) {
+  // set input value and trigger input event to display
+  document.getElementById(name).value = value;
+  document.getElementById(name).dispatchEvent(new Event('input'));
+}
+
+function copyLink() {
+  // copies link with current parameters to clipboard
+  var url = new URL(window.location.href);
+  url.searchParams.set('xf', document.getElementById('x_freq').value);
+  url.searchParams.set('yf', document.getElementById('y_freq').value);
+  url.searchParams.set('samples', document.getElementById('samples').value);
+  navigator.clipboard.writeText(url.toString());
+  blinkSpan('copied');
+}
+
+async function setupgl(gl) {
+  // setup gl
+  var vertCode = `
+    attribute vec3 coordinates;
+    void main(void) {
+      gl_Position = vec4(coordinates, 1.0);
+      gl_PointSize = 10.0;
+    }`;
+  var vertShader = gl.createShader(gl.VERTEX_SHADER);
+  gl.shaderSource(vertShader, vertCode);
+  gl.compileShader(vertShader);
+  var fragCode = `
+    void main(void) {
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 0.2);
+    }`;
+  var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(fragShader, fragCode);
+  gl.compileShader(fragShader);
+  var shaderProgram = gl.createProgram();
+  gl.attachShader(shaderProgram, vertShader);
+  gl.attachShader(shaderProgram, fragShader);
+  gl.linkProgram(shaderProgram);
+  gl.useProgram(shaderProgram);
 }
 
 async function drawLissajous(gl,
@@ -58,33 +116,21 @@ window.addEventListener('DOMContentLoaded', function () {
 
   console.log(gl.getParameter(gl.VERSION), gl.getParameter(gl.SHADING_LANGUAGE_VERSION));
 
-  // setup gl
-  var vertCode = `
-    attribute vec3 coordinates;
-    void main(void) {
-      gl_Position = vec4(coordinates, 1.0);
-      gl_PointSize = 10.0;
-    }`;
-  var vertShader = gl.createShader(gl.VERTEX_SHADER);
-  gl.shaderSource(vertShader, vertCode);
-  gl.compileShader(vertShader);
-  var fragCode = `
-    void main(void) {
-      gl_FragColor = vec4(1.0, 1.0, 1.0, 0.2);
-    }`;
-  var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-  gl.shaderSource(fragShader, fragCode);
-  gl.compileShader(fragShader);
-  var shaderProgram = gl.createProgram();
-  gl.attachShader(shaderProgram, vertShader);
-  gl.attachShader(shaderProgram, fragShader);
-  gl.linkProgram(shaderProgram);
-  gl.useProgram(shaderProgram);
+  setupgl(gl);
 
-  drawLissajous(gl, 10, 14, 100);
+  // read query parameters or select random start
+  const params = new Proxy(new URLSearchParams(window.location.search), {
+    get: (searchParams, prop) => searchParams.get(prop),
+  });
+  starting_xf = params.xf || Math.floor(Math.random() * 150) + 1;
+  starting_yf = params.yf || Math.floor(Math.random() * 150) + 1;
+  starting_samples = params.samples || Math.floor(Math.random() * 300) + 10;
+
+  setInput('x_freq', starting_xf);
+  setInput('y_freq', starting_yf);
+  setInput('samples', starting_samples);
 
   options.addEventListener('input', function() {
-    clearCanvas(gl);
     drawLissajous(gl,
                   document.getElementById('x_freq').value,
                   document.getElementById('y_freq').value,
@@ -102,8 +148,7 @@ window.addEventListener('DOMContentLoaded', function () {
       if (x_phase >= 360) {
         x_phase = 0;
       }
-      document.getElementById('x_phase').value = x_phase;
-      document.getElementById('x_phase').dispatchEvent(new Event('input'));
+      setInput('x_phase', x_phase)
       options.dispatchEvent(new Event('input'));
     }
   }
@@ -135,11 +180,8 @@ window.addEventListener('DOMContentLoaded', function () {
       var y = e.clientY - bounds.top;
       var x_phase = (x / bounds.width) * 360;
       var y_phase = (y / bounds.height) * 360;
-      document.getElementById('x_phase').value = x_phase;
-      document.getElementById('x_phase').dispatchEvent(new Event('input'));
-      document.getElementById('y_phase').value = y_phase;
-      document.getElementById('y_phase').dispatchEvent(new Event('input'));
-      clearCanvas(gl);
+      setInput('x_phase', x_phase);
+      setInput('y_phase', y_phase);
       drawLissajous(gl,
                     document.getElementById('x_freq').value,
                     document.getElementById('y_freq').value,

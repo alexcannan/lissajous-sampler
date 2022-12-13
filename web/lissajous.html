@@ -14,12 +14,12 @@
     <div id="options">
       <div class="option">
         <label>X Frequency</label>
-        <input type="range" id="x_freq" min="1" max="100" value="10" step="1" oninput="this.nextElementSibling.value = this.value">
+        <input type="range" id="x_freq" min="1" max="300" value="10" step="1" oninput="this.nextElementSibling.value = this.value">
         <output>10</output>
       </div>
       <div class="option">
         <label>Y Frequency</label>
-        <input type="range" id="y_freq" min="1" max="100" value="14" step="1" oninput="this.nextElementSibling.value = this.value">
+        <input type="range" id="y_freq" min="1" max="300" value="14" step="1" oninput="this.nextElementSibling.value = this.value">
         <output>14</output>
       </div>
       <div class="option">
@@ -34,9 +34,10 @@
       </div>
       <div class="option">
         <label>Samples</label>
-        <input type="range" id="samples" min="0" max="1000" value="50" step="1" oninput="this.nextElementSibling.value = this.value">
+        <input type="range" id="samples" min="0" max="5000" value="50" step="1" oninput="this.nextElementSibling.value = this.value">
         <output>50</output>
       </div>
+      <button id="share" onclick="copyLink()">⛓️ share</button><span id="copied" style="display:none;">copied to clipboard</span>
     </div>
   </body>
 </html>

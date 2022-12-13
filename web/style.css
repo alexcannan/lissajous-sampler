@@ -1,6 +1,7 @@
 body {
     background-color: black;
     color: white;
+    font-family: monospace;
 }
 
 output {
@@ -8,7 +9,6 @@ output {
 }
 
 label {
-    font-family: sans-serif;
     white-space: nowrap;
     float: left;
 }
@@ -16,6 +16,8 @@ label {
 #glcanvas {
     aspect-ratio: 1/1;
     height: 100%;
+    margin-top: 10px;
+    margin-bottom: 20px;
 }
 
 #drawing {
@@ -41,7 +43,6 @@ line {
 }
 
 #options {
-    display: grid;
     grid-gap: 1em;
     position: absolute;
     height: 20%;
@@ -55,4 +56,22 @@ line {
 
 #options label::after {
     content: ": ";
+}
+
+.option {
+    width: 100%;
+}
+
+button {
+    background-color: darkslategray;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 16px;
+    font-family: monospace;
+}
+
+#copied {
+    margin-left: 1em;
 }
