@@ -112,18 +112,22 @@ window.addEventListener('DOMContentLoaded', function () {
   const rotatorInterval = setInterval(rotate, 1000/fps);
 
   function ondown(e) {
+    e.preventDefault();
     isMoving = true;
   }
 
   function onup(e) {
+    e.preventDefault();
     isMoving = false;
   }
 
   function ondbl(e) {
+    e.preventDefault();
     isRotating = !isRotating;
   }
 
   function onmove(e) {
+    e.preventDefault();
     if (isMoving) {
       isRotating = false;
       var bounds = drawing.getBoundingClientRect();

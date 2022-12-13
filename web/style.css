@@ -25,6 +25,7 @@ label {
     top: 0%;
     display: flex;
     justify-content: center;
+    touch-action: none;
 }
 
 svg {
