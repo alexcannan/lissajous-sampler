@@ -8,5 +8,9 @@ setup(
     packages=find_packages(),
     install_requires=[
         'Pillow',
+        'fastapi',
+        'gunicorn',
+        'uvicorn[standard]',
+        'jinja2',
     ],
 )
