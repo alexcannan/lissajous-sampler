@@ -16,33 +16,71 @@
     <div id="drawing">
       <canvas id="glcanvas"></canvas>
     </div>
-    <div id="options">
-      <div class="option">
-        <label>X Frequency</label>
-        <input type="range" id="x_freq" min="1" max="300" value="10" step="1" oninput="this.nextElementSibling.value = this.value">
-        <output>10</output>
+    <div id="buttons">
+      <div class="buttonGroup parameters">
+        <div class="buttonContent" id="options">
+          <div class="option">
+            <label>X Frequency</label>
+            <input type="range" id="x_freq" min="1" max="300" value="10" step="1" oninput="this.nextElementSibling.value = this.value">
+            <output contenteditable="true">10</output>
+          </div>
+          <div class="option">
+            <label>Y Frequency</label>
+            <input type="range" id="y_freq" min="1" max="300" value="14" step="1" oninput="this.nextElementSibling.value = this.value">
+            <output contenteditable="true">14</output>
+          </div>
+          <div class="option">
+            <label>X Phase</label>
+            <input type="range" id="x_phase" min="0" max="360" value="0" step="0.1" oninput="this.nextElementSibling.value = this.value">
+            <output contenteditable="true">0</output>
+          </div>
+          <div class="option">
+            <label>Y Phase</label>
+            <input type="range" id="y_phase" min="0" max="360" value="0" step="0.1" oninput="this.nextElementSibling.value = this.value">
+            <output contenteditable="true">0</output>
+          </div>
+          <div class="option">
+            <label>Samples</label>
+            <input type="range" id="samples" min="0" max="5000" value="50" step="1" oninput="this.nextElementSibling.value = this.value">
+            <output contenteditable="true">50</output>
+          </div>
+        </div>
+        <button id="optionsButton" class="collapsable">⚙️ parameters</button>
       </div>
-      <div class="option">
-        <label>Y Frequency</label>
-        <input type="range" id="y_freq" min="1" max="300" value="14" step="1" oninput="this.nextElementSibling.value = this.value">
-        <output>14</output>
+      <div class="buttonGroup animation">
+        <div class="buttonContent" id="animationOptions">
+          <div class="option">
+            <label>Animation Speed</label>
+            <input type="range" id="animationSpeed" min="0" max="100" value="50" step="1" oninput="this.nextElementSibling.value = this.value">
+            <output>50</output>
+          </div>
+          <div class="option">
+            <label>Animation Type</label>
+            <select id="animationType">
+              <option value="0">X Frequency</option>
+              <option value="1">Y Frequency</option>
+            </select>
+          </div>
+        </div>
+        <button id="animateButton" class="collapsable">🎬 animate</button>
       </div>
-      <div class="option">
-        <label>X Phase</label>
-        <input type="range" id="x_phase" min="0" max="360" value="0" step="0.1" oninput="this.nextElementSibling.value = this.value">
-        <output>0</output>
+      <div class="buttonGroup share">
+        <span id="copied" style="display:none;">copied to clipboard</span>
+        <button id="share" onclick="copyLink()">⛓️ share</button>
       </div>
-      <div class="option">
-        <label>Y Phase</label>
-        <input type="range" id="y_phase" min="0" max="360" value="0" step="0.1" oninput="this.nextElementSibling.value = this.value">
-        <output>0</output>
+      <div class="buttonGroup random">
+        <button id="random" onclick="randomize()">🎲 random</button>
       </div>
-      <div class="option">
-        <label>Samples</label>
-        <input type="range" id="samples" min="0" max="5000" value="50" step="1" oninput="this.nextElementSibling.value = this.value">
-        <output>50</output>
+      <div class="buttonGroup fullscreen">
+        <button id="fullscreen" onclick="toggleFullscreen()">📺 fullscreen</button>
       </div>
-      <button id="share" onclick="copyLink()">⛓️ share</button><span id="copied" style="display:none;">copied to clipboard</span>
+      <div class="buttonGroup about">
+        <div class="buttonContent" id="about">
+          <p>made by <a target="_blank" href="https://github.com/alexcannan">Alex Cannan</a></p>
+          <p>what are <a target="_blank" href="https://archive.org/details/jstor-25138613">Lissajous curves</a>?</p>
+          <p>what is the <a target="_blank" href="https://web.archive.org/web/20060706192816/http://www.loe.ee.upatras.gr/Comes/Notes/Nyquist.pdf">Nyquist frequency</a>?</p>
+        </div>
+        <button id="aboutButton" class="collapsable">ℹ️ about</button>
     </div>
   </body>
 </html>

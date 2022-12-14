@@ -9,32 +9,40 @@ function degrees_to_radians(degrees) {
   return degrees * Math.PI / 180;
 }
 
+function toggleFullscreen() {
+  // TODO
+  console.log('need to implement toggleFullscreen');
+}
+
+function randomize() {
+  // randomize parameters
+  setInput('x_freq', Math.floor(Math.random() * 150) + 1);
+  setInput('y_freq', Math.floor(Math.random() * 150) + 1);
+  setInput('samples', Math.floor(Math.random() * 300) + 10);
+}
+
 function blinkSpan(spanId) {
   // given a span id, display for 1 second then fade
   var span = document.getElementById(spanId);
   var op = 1;
   span.style.display = 'inline';
   span.style.opacity = op;
-  var counter = 0;
   var timer = setInterval(function() {
-    counter++;
-    if (counter <= 20) {
-      return;
-    }
-    if (op <= 0.01) {
+    if (op <= 0.2) {
       clearInterval(timer);
       span.style.display = 'none';
     }
     span.style.opacity = op;
     span.style.filter = 'alpha(opacity=' + op * 100 + ")";
-    op -= op * 0.1;
-  }, 50);
+    op -= op * 0.02;
+  }, 25);
 }
 
 function setInput(name, value) {
   // set input value and trigger input event to display
   document.getElementById(name).value = value;
   document.getElementById(name).dispatchEvent(new Event('input'));
+  document.querySelector('#options').dispatchEvent(new Event('input'));
 }
 
 function copyLink() {
@@ -100,6 +108,7 @@ async function drawLissajous(gl,
 
 window.addEventListener('DOMContentLoaded', function () {
   const drawing = document.getElementById('drawing');
+  const optionsButton = document.getElementById('optionsButton');
   const options = document.getElementById('options');
   console.log('hi from DOMContentLoaded');
 
@@ -125,11 +134,40 @@ window.addEventListener('DOMContentLoaded', function () {
   starting_xf = params.xf || Math.floor(Math.random() * 150) + 1;
   starting_yf = params.yf || Math.floor(Math.random() * 150) + 1;
   starting_samples = params.samples || Math.floor(Math.random() * 300) + 10;
-
   setInput('x_freq', starting_xf);
   setInput('y_freq', starting_yf);
   setInput('samples', starting_samples);
 
+  // collapsable buttons
+  var coll = document.getElementsByClassName("collapsable");
+  var i;
+  for (i = 0; i < coll.length; i++) {
+    coll[i].addEventListener("click", function() {
+      console.log(`hi from collapsible click for ${this.id}`)
+      this.classList.toggle("active");
+      var content = this.parentElement.querySelector('.buttonContent');
+      console.log(content, content.id)
+      if (content.style.maxHeight){
+        content.style.maxHeight = null;
+      } else {
+        content.style.maxHeight = content.scrollHeight + "px";
+      }
+    });
+  }
+
+  // allow users to edit options with text input
+  var outputs = document.querySelectorAll("output");
+  var i;
+  for (i = 0; i < outputs.length; i++) {
+    outputs[i].addEventListener("keydown", function(e) {
+      if (e.key === 'Enter') {
+        setInput(this.parentElement.querySelector('input').id, this.value);
+        e.preventDefault();
+      }
+    });
+  }
+
+  // automatically draw
   options.addEventListener('input', function() {
     drawLissajous(gl,
                   document.getElementById('x_freq').value,
