@@ -78,5 +78,5 @@ def draw_lissajous_grid(x_freqs: list[int], y_freqs: list[int], *args, **kwargs)
 if __name__ == "__main__":
     # im = draw_lissajous_grid(list(range(1,6)), list(range(10,15)), 50)
     # im.resize((6000, 6000)).show()
-    svg = draw_lissajous_curve_svg(8,19,54)
+    svg = draw_lissajous_curve_svg(11,13,50)
     print(svg)
