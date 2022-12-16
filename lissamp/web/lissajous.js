@@ -2,6 +2,7 @@
 
 console.log('hi from lissajous.js');
 
+const fps = 50;
 var isMoving = false;
 var isRotating = true;
 
@@ -70,7 +71,8 @@ function copyLink() {
   url.searchParams.set('xf', document.getElementById('x_freq').value);
   url.searchParams.set('yf', document.getElementById('y_freq').value);
   url.searchParams.set('samples', document.getElementById('samples').value);
-  navigator.clipboard.writeText(url.toString());
+  // navigator.clipboard.writeText(url.toString());
+  console.log(`can't copy to clipboard when serving so jsyk we copied ${url.toString()}`)
   blinkSpan('copied');
 }
 
@@ -162,10 +164,8 @@ window.addEventListener('DOMContentLoaded', function () {
   var i;
   for (i = 0; i < coll.length; i++) {
     coll[i].addEventListener("click", function() {
-      console.log(`hi from collapsible click for ${this.id}`)
       this.classList.toggle("active");
       var content = this.parentElement.querySelector('.buttonContent');
-      console.log(content, content.id)
       if (content.style.maxHeight){
         content.style.maxHeight = null;
       } else {
@@ -197,20 +197,39 @@ window.addEventListener('DOMContentLoaded', function () {
   });
 
   function rotate() {
-    // rotates x phase on pageload and after doubleclick
     if (isRotating) {
-      const x_phase_input = document.getElementById('x_phase')
-      var x_phase = x_phase_input.value;
-      x_phase = Number(x_phase) + Number(x_phase_input.step);
-      if (x_phase >= 360) {
-        x_phase = 0;
+      var animationSpeed = document.getElementById('animationSpeed').value;
+      if (document.getElementById('radioX').checked) {
+        input_id = 'x_phase';
+      } else if (document.getElementById('radioY').checked) {
+        input_id = 'y_phase';
+      } else if (document.getElementById('radioXY').checked) {
+        var phaseX = document.getElementById('x_phase').value;
+        var phaseY = document.getElementById('y_phase').value;
+        // divide by sqrt(2) bc of pythagorean theorem
+        phaseX = Number(phaseX) + 0.1 * (animationSpeed / 50 / Math.sqrt(2));
+        phaseY = Number(phaseY) + 0.1 * (animationSpeed / 50 / Math.sqrt(2));
+        if (phaseX >= 360) { phaseX = 0; }
+        if (phaseY >= 360) { phaseY = 0; }
+        // don't use setInput bc it would trigger a duplicate draw here
+        document.getElementById('x_phase').value = phaseX;
+        document.getElementById('x_phase').dispatchEvent(new Event('input'));
+        document.getElementById('y_phase').value = phaseY;
+        document.getElementById('y_phase').dispatchEvent(new Event('input'));
+        options.dispatchEvent(new Event('input'));
+        return;
       }
-      setInput('x_phase', x_phase)
+      var phase_input = document.getElementById(input_id)
+      var phase = phase_input.value;
+      phase = Number(phase) + 0.1 * (animationSpeed / 50);
+      if (phase >= 360) {
+        phase = 0;
+      }
+      setInput(input_id, phase)
       options.dispatchEvent(new Event('input'));
     }
   }
 
-  const fps = 50;
   const rotatorInterval = setInterval(rotate, 1000/fps);
 
   function ondown(e) {

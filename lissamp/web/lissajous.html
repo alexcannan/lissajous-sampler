@@ -22,27 +22,27 @@
           <div class="option">
             <label>X Frequency</label>
             <input type="range" id="x_freq" min="1" max="300" value="10" step="1" oninput="this.nextElementSibling.value = this.value">
-            <output contenteditable="true">10</output>
+            <input type="number" id="x_freq2" min="1" max="300" value="10" step="1" oninput="this.previousElementSibling.value = this.value">
           </div>
           <div class="option">
             <label>Y Frequency</label>
             <input type="range" id="y_freq" min="1" max="300" value="14" step="1" oninput="this.nextElementSibling.value = this.value">
-            <output contenteditable="true">14</output>
+            <input type="number" id="y_freq2" min="1" max="300" value="14" step="1" oninput="this.previousElementSibling.value = this.value">
           </div>
           <div class="option">
             <label>X Phase</label>
-            <input type="range" id="x_phase" min="0" max="360" value="0" step="0.1" oninput="this.nextElementSibling.value = this.value">
-            <output contenteditable="true">0</output>
+            <input type="range" id="x_phase" min="0" max="360" value="0" step="0.01" oninput="this.nextElementSibling.value = this.value">
+            <input type="number" id="x_phase2" min="0" max="360" value="0" step="0.1" oninput="this.previousElementSibling.value = this.value">
           </div>
           <div class="option">
             <label>Y Phase</label>
-            <input type="range" id="y_phase" min="0" max="360" value="0" step="0.1" oninput="this.nextElementSibling.value = this.value">
-            <output contenteditable="true">0</output>
+            <input type="range" id="y_phase" min="0" max="360" value="0" step="0.01" oninput="this.nextElementSibling.value = this.value">
+            <input type="number" id="y_phase2" min="0" max="360" value="0" step="0.1" oninput="this.previousElementSibling.value = this.value">
           </div>
           <div class="option">
             <label>Samples</label>
             <input type="range" id="samples" min="0" max="5000" value="50" step="1" oninput="this.nextElementSibling.value = this.value">
-            <output contenteditable="true">50</output>
+            <input type="number" id="samples2" min="0" max="5000" value="50" step="1" oninput="this.previousElementSibling.value = this.value">
           </div>
         </div>
         <button id="optionsButton" class="collapsable">⚙️ parameters</button>
@@ -51,15 +51,19 @@
         <div class="buttonContent" id="animationOptions">
           <div class="option">
             <label>Animation Speed</label>
-            <input type="range" id="animationSpeed" min="0" max="100" value="50" step="1" oninput="this.nextElementSibling.value = this.value">
-            <output>50</output>
+            <input type="range" id="animationSpeed" min="1" max="100" value="50" step="1" oninput="this.nextElementSibling.value = this.value">
+            <input type="number" id="animationSpeed2" min="1" max="100" value="50" step="1" oninput="this.previousElementSibling.value = this.value">
           </div>
           <div class="option">
             <label>Animation Type</label>
-            <select id="animationType">
-              <option value="0">X Frequency</option>
-              <option value="1">Y Frequency</option>
-            </select>
+            <div id="animationRadio">
+              <input type="radio" id="radioX" name="animationType" value="x" checked>
+              <label for="radioX">X</label>
+              <input type="radio" id="radioXY" name="animationType" value="xy">
+              <label for="radioXY">XY</label>
+              <input type="radio" id="radioY" name="animationType" value="y">
+              <label for="radioY">Y</label>
+            </div>
           </div>
         </div>
         <button id="animateButton" class="collapsable">🎬 animate</button>
@@ -79,6 +83,7 @@
           <p>made by <a target="_blank" href="https://github.com/alexcannan">Alex Cannan</a></p>
           <p>what are <a target="_blank" href="https://archive.org/details/jstor-25138613">Lissajous curves</a>?</p>
           <p>what is the <a target="_blank" href="https://web.archive.org/web/20060706192816/http://www.loe.ee.upatras.gr/Comes/Notes/Nyquist.pdf">Nyquist frequency</a>?</p>
+          <p>have any <a target="_blank" href="https://github.com/alexcannan/lissajous-sampler/issues">issues</a>?</p>
         </div>
         <button id="aboutButton" class="collapsable">ℹ️ about</button>
     </div>

@@ -44,13 +44,6 @@ label {
     width: 100%;
 }
 
-/* .buttonGroup.parameters { grid-column: 1 / 2; }
-.buttonGroup.animation { grid-column: 2 / 3; }
-.buttonGroup.share { grid-column: 3 / 4; }
-.buttonGroup.random { grid-column: 1 / 2; }
-.buttonGroup.fullscreen { grid-column: 2 / 3; }
-.buttonGroup.about { grid-column: 3 / 4; } */
-
 button {
     background-color: darkslategray;
     color: white;
@@ -74,11 +67,24 @@ a {
 }
 
 .buttonContent {
-    padding: 0 18px;
+    border: 1ch solid transparent;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.2s ease-out;
     background-color: rgba(47, 79, 79, 0.4);
+}
+
+#buttons input[type=number] {
+    width: 4em;
+    background: 0;
+    border: 0;
+    color: white;
+}
+
+#buttons select {
+    background: 0;
+    border: 0;
+    color: white;
 }
 
 .option label {
@@ -86,14 +92,27 @@ a {
     text-align: right;
 }
 
-.option label::after {
-    content: ": ";
-}
-
 .option {
-    width: 100%;
+    display: grid;
 }
 
-#copied {
-    margin-left: 1em;
+#animationRadio {
+    display: flex;
+    justify-content: center;
+}
+
+#animationRadio input[type="radio"] {
+    display: none;
+}
+
+#animationRadio label {
+    display: inline-block;
+    padding: 4px 11px;
+    font-family: Arial;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#animationRadio input[type="radio"]:checked+label {
+    background-color: #bbb;
 }
