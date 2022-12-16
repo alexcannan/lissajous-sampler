@@ -10,9 +10,28 @@ function degrees_to_radians(degrees) {
 }
 
 function toggleFullscreen() {
-  // TODO
-  console.log('need to implement toggleFullscreen');
+  var elem = document.getElementById("glcanvas");
+
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.webkitRequestFullscreen) { /* Safari */
+    elem.webkitRequestFullscreen();
+  } else if (elem.msRequestFullscreen) { /* IE11 */
+    elem.msRequestFullscreen();
+  }
 }
+
+function resizeCanvasToDisplaySize(canvas) {
+  const displayWidth  = canvas.clientWidth;
+  const displayHeight = canvas.clientHeight;
+  const needResize = canvas.width  !== displayWidth ||
+                     canvas.height !== displayHeight;
+  if (needResize) {
+    canvas.width  = displayHeight;
+    canvas.height = displayHeight;
+  }
+}
+
 
 function randomize() {
   // randomize parameters
@@ -93,8 +112,8 @@ async function drawLissajous(gl,
     var y = Math.sin(y_freq * w + degrees_to_radians(y_phase));
     vertices.push(x, y, 0)
   }
-  var width = gl.canvas.width;
-  var height = gl.canvas.height;
+  resizeCanvasToDisplaySize(gl.canvas);
+  side = Math.min(gl.canvas.width, gl.canvas.height);
   var vertex_buffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -102,7 +121,7 @@ async function drawLissajous(gl,
   var coord = gl.getAttribLocation(shaderProgram, "coordinates");
   gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(coord);
-  gl.viewport(0, 0, width, height);
+  gl.viewport(0, 0, side, side);
   gl.drawArrays(gl.LINE_STRIP, 0, vertices.length / 3);
 };
 
