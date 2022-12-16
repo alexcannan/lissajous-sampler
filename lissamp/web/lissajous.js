@@ -85,8 +85,26 @@ function copyLink() {
   blinkSpan('copied');
 }
 
+function hexToRgb(hex) {
+  // returns an array of rgb values from 0 to 1
+  // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+  var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+  hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+    return r + r + g + g + b + b;
+  });
+
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16) / 255,
+    g: parseInt(result[2], 16) / 255,
+    b: parseInt(result[3], 16) / 255
+  } : null;
+}
+
 async function setupgl(gl) {
   // setup gl
+  var color = hexToRgb(document.getElementById('animationColor').value);
+  console.log(color);
   var vertCode = `
     attribute vec3 coordinates;
     void main(void) {
@@ -98,7 +116,7 @@ async function setupgl(gl) {
   gl.compileShader(vertShader);
   var fragCode = `
     void main(void) {
-      gl_FragColor = vec4(1.0, 1.0, 1.0, 0.2);
+      gl_FragColor = vec4(${color.r}, ${color.g}, ${color.b}, 1.0);
     }`;
   var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
   gl.shaderSource(fragShader, fragCode);
@@ -182,6 +200,11 @@ window.addEventListener('DOMContentLoaded', function () {
       }
     });
   }
+
+  // update color when animationColor changed
+  document.getElementById('animationColor').addEventListener('input', function() {
+    setupgl(gl);
+  });
 
   // automatically draw
   options.addEventListener('input', function() {

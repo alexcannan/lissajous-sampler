@@ -125,6 +125,7 @@ input[type=range] {
 
 #buttons label span {
   background-color: var(--slider-color);
+  font-weight: bold;
 }
 
 #animationRadio {
