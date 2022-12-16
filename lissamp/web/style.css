@@ -1,16 +1,17 @@
 :root {
-  --button-color: darkslategray;
-  --drawer-color: rgba(47, 79, 79, 0.4);
-  --text-color: white;
+  --button-color: #262d3a;
+  --drawer-color: rgba(38, 45, 58, 0.4);
+  --text-color: #f9eae5;
+  --background-color: #080706;
   --link-color: rgba(80, 100, 120, 1);
-  --inactive-color: rgb(32, 64, 64);
-  --active-color: rgb(113, 192, 168);
-  --slider-color: darkslategray;
+  --inactive-color: #262d3a;
+  --active-color: #aaba3d;
+  --slider-color: #262d3a;
 }
 
 body {
-  background-color: black;
-  color: white;
+  background-color: var(--background-color);
+  color: var(--text-color);
   font-family: monospace;
   display: flex;
   justify-content: center;
@@ -120,6 +121,10 @@ input[type=range] {
 
 .option {
     display: grid;
+}
+
+#buttons label span {
+  background-color: var(--slider-color);
 }
 
 #animationRadio {

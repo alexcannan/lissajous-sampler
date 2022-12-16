@@ -138,9 +138,9 @@ async function drawLissajous(gl,
 
 window.addEventListener('DOMContentLoaded', function () {
   const drawing = document.getElementById('drawing');
-  const optionsButton = document.getElementById('optionsButton');
   const options = document.getElementById('options');
   console.log('hi from DOMContentLoaded');
+  this.document.querySelector('#animationToggle').checked = true;
 
   const glcanvas = document.getElementById('glcanvas');
   var bounds = glcanvas.getBoundingClientRect();
