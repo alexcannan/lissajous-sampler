@@ -174,18 +174,6 @@ window.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // allow users to edit options with text input
-  var outputs = document.querySelectorAll("output");
-  var i;
-  for (i = 0; i < outputs.length; i++) {
-    outputs[i].addEventListener("keydown", function(e) {
-      if (e.key === 'Enter') {
-        setInput(this.parentElement.querySelector('input').id, this.value);
-        e.preventDefault();
-      }
-    });
-  }
-
   // automatically draw
   options.addEventListener('input', function() {
     drawLissajous(gl,
