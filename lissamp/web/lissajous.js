@@ -4,7 +4,6 @@ console.log('hi from lissajous.js');
 
 const fps = 50;
 var isMoving = false;
-var isRotating = true;
 
 function degrees_to_radians(degrees) {
   return degrees * Math.PI / 180;
@@ -34,11 +33,21 @@ function resizeCanvasToDisplaySize(canvas) {
 }
 
 
-function randomize() {
-  // randomize parameters
+function oldRandomize() {
+  // old random function that created strange patterns due to triple draws
   setInput('x_freq', Math.floor(Math.random() * 150) + 1);
   setInput('y_freq', Math.floor(Math.random() * 150) + 1);
   setInput('samples', Math.floor(Math.random() * 300) + 10);
+}
+
+function randomize() {
+  document.getElementById('x_freq').value = Math.floor(Math.random() * 150) + 1;
+  document.getElementById('x_freq').dispatchEvent(new Event('input'));
+  document.getElementById('y_freq').value = Math.floor(Math.random() * 150) + 1;
+  document.getElementById('y_freq').dispatchEvent(new Event('input'));
+  document.getElementById('samples').value = Math.floor(Math.random() * 300) + 10;
+  document.getElementById('samples').dispatchEvent(new Event('input'));
+  document.querySelector('#options').dispatchEvent(new Event('input'));
 }
 
 function blinkSpan(spanId) {
@@ -185,7 +194,7 @@ window.addEventListener('DOMContentLoaded', function () {
   });
 
   function rotate() {
-    if (isRotating) {
+    if (document.querySelector('#animationToggle').checked) {
       var animationSpeed = document.getElementById('animationSpeed').value;
       if (document.getElementById('radioX').checked) {
         input_id = 'x_phase';
@@ -232,13 +241,13 @@ window.addEventListener('DOMContentLoaded', function () {
 
   function ondbl(e) {
     e.preventDefault();
-    isRotating = !isRotating;
+    document.querySelector('#animationToggle').click();
   }
 
   function onmove(e) {
     e.preventDefault();
     if (isMoving) {
-      isRotating = false;
+      document.querySelector('#animationToggle').checked = false;
       var bounds = drawing.getBoundingClientRect();
       var x = e.clientX - bounds.left;
       var y = e.clientY - bounds.top;

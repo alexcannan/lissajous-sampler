@@ -1,95 +1,121 @@
+:root {
+  --button-color: darkslategray;
+  --drawer-color: rgba(47, 79, 79, 0.4);
+  --text-color: white;
+  --link-color: rgba(80, 100, 120, 1);
+  --inactive-color: rgb(32, 64, 64);
+  --active-color: rgb(113, 192, 168);
+  --slider-color: darkslategray;
+}
+
 body {
-    background-color: black;
-    color: white;
-    font-family: monospace;
+  background-color: black;
+  color: white;
+  font-family: monospace;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
 output {
-    font-family: monospace;
+  font-family: monospace;
 }
 
 label {
-    white-space: nowrap;
-    float: left;
+  white-space: nowrap;
+  float: left;
 }
 
 #glcanvas {
-    aspect-ratio: 1/1;
-    height: 100%;
-    max-width: 100%;
-    margin-top: 10px;
-    margin-bottom: 20px;
+  aspect-ratio: 1/1;
+  height: 100%;
+  max-width: 100%;
+  margin-top: 10px;
+  margin-bottom: 20px;
 }
 
 #drawing {
-    position: absolute;
-    width: 100%;
-    height: 90%;
-    top: 0%;
-    display: flex;
-    justify-content: center;
-    touch-action: none;
+  position: absolute;
+  width: 100%;
+  height: 90%;
+  top: 0%;
+  display: flex;
+  justify-content: center;
+  touch-action: none;
 }
 
 #buttons {
-    grid-gap: 1em;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    display: grid;
-    grid-template-columns: 2fr 2fr 1fr 1fr 1fr 1fr;
+  grid-gap: 1em;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr 1fr 1fr 1fr;
 }
 
 .buttonGroup button {
-    width: 100%;
+  width: 100%;
 }
 
 button {
-    background-color: darkslategray;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    text-align: center;
-    font-size: 1fr;
-    font-family: monospace;
+  background-color: var(--button-color);
+  color: var(--text-color);
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  font-size: 1fr;
+  font-family: monospace;
+  overflow: clip;
 }
 
 a {
-    color: white;
-    text-decoration: none;
-    color:rgba(80, 100, 120, 1)
+  text-decoration: none;
+  color: var(--link-color);
+}
+
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--slider-color);
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
 }
 
 .buttonGroup {
-    display: inline-block;
-    bottom: 0;
-    align-self: flex-end;
+  display: inline-block;
+  bottom: 0;
+  align-self: flex-end;
 }
 
 .buttonContent {
-    border: 1ch solid transparent;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.2s ease-out;
-    background-color: rgba(47, 79, 79, 0.4);
+  border: 1ch solid transparent;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+  background-color: var(--drawer-color);
 }
 
 #buttons input[type=number] {
-    width: 4em;
-    background: 0;
-    border: 0;
-    color: white;
+  width: 4em;
+  background: 0;
+  border: 0;
+  color: var(--text-color)
 }
 
 #buttons select {
-    background: 0;
-    border: 0;
-    color: white;
+  background: 0;
+  border: 0;
+  color: var(--text-color);
 }
 
 .option label {
-    display: block;
-    text-align: right;
+  display: block;
+  text-align: right;
 }
 
 .option {
@@ -97,22 +123,40 @@ a {
 }
 
 #animationRadio {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 
 #animationRadio input[type="radio"] {
-    display: none;
+  display: none;
 }
 
 #animationRadio label {
-    display: inline-block;
-    padding: 4px 11px;
-    font-family: Arial;
-    font-size: 16px;
-    cursor: pointer;
+  display: inline-block;
+  padding: 4px 11px;
+  font-family: Arial;
+  font-size: 16px;
+  cursor: pointer;
 }
 
 #animationRadio input[type="radio"]:checked+label {
-    background-color: #bbb;
+  background-color: var(--button-color);
+}
+
+input[type=checkbox]{
+  height: 0;
+  width: 0;
+  visibility: hidden;
+}
+
+label[for=animationToggle] {
+  cursor: pointer;
+  background: var(--inactive-color);
+  display: block;
+  position: relative;
+  color: transparent;
+}
+
+input:checked + label {
+  background: var(--active-color);
 }
