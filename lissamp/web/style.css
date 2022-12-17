@@ -97,6 +97,7 @@ input[type=range] {
   border: 1ch solid transparent;
   max-height: 0;
   overflow: hidden;
+  display: grid;
   transition: max-height 0.2s ease-out;
   background-color: var(--drawer-color);
 }
@@ -121,6 +122,7 @@ input[type=range] {
 
 .option {
     display: grid;
+    margin: 1ch;
 }
 
 #buttons label span {
@@ -128,10 +130,10 @@ input[type=range] {
   font-weight: bold;
 }
 
-#animationRadio {
+/* #animationRadio {
   display: flex;
   justify-content: center;
-}
+} */
 
 #animationRadio input[type="radio"] {
   display: none;

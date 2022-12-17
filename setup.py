@@ -12,5 +12,8 @@ setup(
         'gunicorn',
         'uvicorn[standard]',
         'jinja2',
+        'motor',
+        'loguru',
+        'pydantic',
     ],
 )
