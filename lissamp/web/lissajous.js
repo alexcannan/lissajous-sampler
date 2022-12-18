@@ -80,8 +80,7 @@ function copyLink() {
   url.searchParams.set('xf', document.getElementById('x_freq').value);
   url.searchParams.set('yf', document.getElementById('y_freq').value);
   url.searchParams.set('samples', document.getElementById('samples').value);
-  // navigator.clipboard.writeText(url.toString());
-  console.log(`can't copy to clipboard when serving so jsyk we copied ${url.toString()}`)
+  navigator.clipboard.writeText(url.toString());
   blinkSpan('copied');
 }
 
