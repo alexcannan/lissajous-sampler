@@ -240,9 +240,11 @@ async function drawLissajous(gl,
                              x_phase=0,
                              y_phase=0,
                              z_phase=0) {
+  const sampleCount = Math.max(Number(samples), 1);
   var vertices = [];
-  for (var i = 0; i <= samples; i++) {
-    var w = (2 * Math.PI * i) / samples;
+  for (var i = 0; i <= sampleCount; i++) {
+    var t = i / sampleCount;
+    var w = 2 * Math.PI * t;
     var x = Math.sin(x_freq * w + degrees_to_radians(x_phase));
     var y = Math.sin(y_freq * w + degrees_to_radians(y_phase));
     var z = Math.sin(z_freq * w + degrees_to_radians(z_phase));
