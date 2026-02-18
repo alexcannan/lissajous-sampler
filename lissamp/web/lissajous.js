@@ -16,6 +16,11 @@ var cameraAutoYawSpeed = 0;
 const cameraOrbitSpeed = 0.01;
 const cameraAutoYawScale = 0.1;
 const cameraPitchLimit = degrees_to_radians(85);
+var hudEnabled = false;
+var hudElement = null;
+var hudLastFrameStartMs = null;
+var hudAvgFrameMs = null;
+var hudAvgRenderMs = null;
 
 function degrees_to_radians(degrees) {
   return degrees * Math.PI / 180;
@@ -283,6 +288,7 @@ async function drawLissajous(gl,
                              x_phase=0,
                              y_phase=0,
                              z_phase=0) {
+  const frameStartMs = performance.now();
   const sampleCount = Math.max(Number(samples), 1);
   var vertices = [];
   for (var i = 0; i <= sampleCount; i++) {
@@ -314,6 +320,21 @@ async function drawLissajous(gl,
   gl.uniformMatrix4fv(projectionLocation, false, projection);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.drawArrays(gl.LINE_STRIP, 0, vertices.length / 3);
+
+  if (hudEnabled && hudElement !== null) {
+    const renderMs = performance.now() - frameStartMs;
+    const frameMs = hudLastFrameStartMs === null ? null : frameStartMs - hudLastFrameStartMs;
+    hudLastFrameStartMs = frameStartMs;
+    hudAvgRenderMs = hudAvgRenderMs === null ? renderMs : hudAvgRenderMs * 0.9 + renderMs * 0.1;
+    if (frameMs !== null) {
+      hudAvgFrameMs = hudAvgFrameMs === null ? frameMs : hudAvgFrameMs * 0.9 + frameMs * 0.1;
+    }
+    const fpsText = hudAvgFrameMs === null ? "--" : (1000 / hudAvgFrameMs).toFixed(1);
+    const frameText = hudAvgFrameMs === null ? "--" : hudAvgFrameMs.toFixed(2);
+    const renderText = hudAvgRenderMs.toFixed(2);
+    const utilText = hudAvgFrameMs === null ? "--" : ((hudAvgRenderMs / hudAvgFrameMs) * 100).toFixed(0);
+    hudElement.textContent = `fps ${fpsText}\nframe ${frameText}ms\nrender ${renderText}ms\nutil ${utilText}%`;
+  }
 };
 
 window.addEventListener('DOMContentLoaded', function () {
@@ -341,6 +362,25 @@ window.addEventListener('DOMContentLoaded', function () {
   const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
   });
+  hudEnabled = (params.hud || "").toLowerCase() === "true";
+  if (hudEnabled) {
+    hudElement = document.createElement('div');
+    hudElement.style.position = 'absolute';
+    hudElement.style.top = '8px';
+    hudElement.style.left = '8px';
+    hudElement.style.padding = '4px 6px';
+    hudElement.style.background = 'rgba(0, 0, 0, 0.55)';
+    hudElement.style.border = '1px solid rgba(255, 255, 255, 0.15)';
+    hudElement.style.color = '#d6e5f5';
+    hudElement.style.fontFamily = 'monospace';
+    hudElement.style.fontSize = '10px';
+    hudElement.style.lineHeight = '1.2';
+    hudElement.style.whiteSpace = 'pre';
+    hudElement.style.pointerEvents = 'none';
+    hudElement.style.zIndex = '30';
+    hudElement.textContent = 'fps --\nframe --ms\nrender --ms\nutil --%';
+    drawing.appendChild(hudElement);
+  }
   starting_xf = params.xf || Math.floor(Math.random() * 150) + 1;
   starting_yf = params.yf || Math.floor(Math.random() * 150) + 1;
   starting_zf = params.zf || Math.floor(Math.random() * 150) + 1;
