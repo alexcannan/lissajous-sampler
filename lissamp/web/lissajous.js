@@ -4,9 +4,104 @@ console.log('hi from lissajous.js');
 
 const fps = 50;
 var isMoving = false;
+const initialCameraEye = [2.2, 2.0, 2.2];
+const initialCameraRadius = Math.hypot(initialCameraEye[0], initialCameraEye[1], initialCameraEye[2]);
+var cameraYaw = Math.atan2(initialCameraEye[2], initialCameraEye[0]);
+var cameraPitch = Math.asin(initialCameraEye[1] / initialCameraRadius);
+var cameraRadius = initialCameraRadius;
+var lastPointerX = null;
+var lastPointerY = null;
+const cameraOrbitSpeed = 0.01;
+const cameraPitchLimit = degrees_to_radians(85);
 
 function degrees_to_radians(degrees) {
   return degrees * Math.PI / 180;
+}
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function getCameraEye() {
+  const cosPitch = Math.cos(cameraPitch);
+  return [
+    cameraRadius * cosPitch * Math.cos(cameraYaw),
+    cameraRadius * Math.sin(cameraPitch),
+    cameraRadius * cosPitch * Math.sin(cameraYaw),
+  ];
+}
+
+function perspectiveMatrix(fovyRadians, aspect, near, far) {
+  const f = 1.0 / Math.tan(fovyRadians / 2);
+  const out = new Float32Array(16);
+  out[0] = f / aspect;
+  out[5] = f;
+  out[10] = (far + near) / (near - far);
+  out[11] = -1;
+  out[14] = (2 * far * near) / (near - far);
+  return out;
+}
+
+function lookAtMatrix(eye, center, up) {
+  let zx = eye[0] - center[0];
+  let zy = eye[1] - center[1];
+  let zz = eye[2] - center[2];
+  let zLen = Math.hypot(zx, zy, zz);
+  zx /= zLen;
+  zy /= zLen;
+  zz /= zLen;
+
+  let xx = up[1] * zz - up[2] * zy;
+  let xy = up[2] * zx - up[0] * zz;
+  let xz = up[0] * zy - up[1] * zx;
+  let xLen = Math.hypot(xx, xy, xz);
+  xx /= xLen;
+  xy /= xLen;
+  xz /= xLen;
+
+  const yx = zy * xz - zz * xy;
+  const yy = zz * xx - zx * xz;
+  const yz = zx * xy - zy * xx;
+
+  const out = new Float32Array(16);
+  out[0] = xx;
+  out[1] = yx;
+  out[2] = zx;
+  out[3] = 0;
+  out[4] = xy;
+  out[5] = yy;
+  out[6] = zy;
+  out[7] = 0;
+  out[8] = xz;
+  out[9] = yz;
+  out[10] = zz;
+  out[11] = 0;
+  out[12] = -(xx * eye[0] + xy * eye[1] + xz * eye[2]);
+  out[13] = -(yx * eye[0] + yy * eye[1] + yz * eye[2]);
+  out[14] = -(zx * eye[0] + zy * eye[1] + zz * eye[2]);
+  out[15] = 1;
+  return out;
+}
+
+function identityMatrix() {
+  const out = new Float32Array(16);
+  out[0] = 1;
+  out[5] = 1;
+  out[10] = 1;
+  out[15] = 1;
+  return out;
+}
+
+function compileShader(gl, type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    const log = gl.getShaderInfoLog(shader);
+    gl.deleteShader(shader);
+    throw new Error(log);
+  }
+  return shader;
 }
 
 function toggleFullscreen() {
@@ -45,6 +140,8 @@ function randomize() {
   document.getElementById('x_freq').dispatchEvent(new Event('input'));
   document.getElementById('y_freq').value = Math.floor(Math.random() * 150) + 1;
   document.getElementById('y_freq').dispatchEvent(new Event('input'));
+  document.getElementById('z_freq').value = Math.floor(Math.random() * 150) + 1;
+  document.getElementById('z_freq').dispatchEvent(new Event('input'));
   document.getElementById('samples').value = Math.floor(Math.random() * 300) + 10;
   document.getElementById('samples').dispatchEvent(new Event('input'));
   document.querySelector('#options').dispatchEvent(new Event('input'));
@@ -79,6 +176,7 @@ function copyLink() {
   var url = new URL(window.location.href);
   url.searchParams.set('xf', document.getElementById('x_freq').value);
   url.searchParams.set('yf', document.getElementById('y_freq').value);
+  url.searchParams.set('zf', document.getElementById('z_freq').value);
   url.searchParams.set('samples', document.getElementById('samples').value);
   navigator.clipboard.writeText(url.toString());
   blinkSpan('copied');
@@ -105,43 +203,53 @@ async function setupgl(gl) {
   var color = hexToRgb(document.getElementById('animationColor').value);
   console.log(color);
   var vertCode = `
+    precision mediump float;
     attribute vec3 coordinates;
+    uniform mat4 model;
+    uniform mat4 view;
+    uniform mat4 projection;
     void main(void) {
-      gl_Position = vec4(coordinates, 1.0);
+      gl_Position = projection * view * model * vec4(coordinates, 1.0);
       gl_PointSize = 10.0;
     }`;
-  var vertShader = gl.createShader(gl.VERTEX_SHADER);
-  gl.shaderSource(vertShader, vertCode);
-  gl.compileShader(vertShader);
   var fragCode = `
+    precision mediump float;
     void main(void) {
       gl_FragColor = vec4(${color.r}, ${color.g}, ${color.b}, 1.0);
     }`;
-  var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-  gl.shaderSource(fragShader, fragCode);
-  gl.compileShader(fragShader);
+  var vertShader = compileShader(gl, gl.VERTEX_SHADER, vertCode);
+  var fragShader = compileShader(gl, gl.FRAGMENT_SHADER, fragCode);
   var shaderProgram = gl.createProgram();
   gl.attachShader(shaderProgram, vertShader);
   gl.attachShader(shaderProgram, fragShader);
   gl.linkProgram(shaderProgram);
+  if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+    throw new Error(gl.getProgramInfoLog(shaderProgram));
+  }
   gl.useProgram(shaderProgram);
+  gl.enable(gl.DEPTH_TEST);
+  gl.depthFunc(gl.LEQUAL);
+  gl.clearColor(0.03, 0.03, 0.03, 1.0);
 }
 
 async function drawLissajous(gl,
                              x_freq,
                              y_freq,
+                             z_freq,
                              samples,
                              x_phase=0,
-                             y_phase=0) {
+                             y_phase=0,
+                             z_phase=0) {
   var vertices = [];
   for (var i = 0; i <= samples; i++) {
     var w = (2 * Math.PI * i) / samples;
     var x = Math.sin(x_freq * w + degrees_to_radians(x_phase));
     var y = Math.sin(y_freq * w + degrees_to_radians(y_phase));
-    vertices.push(x, y, 0)
+    var z = Math.sin(z_freq * w + degrees_to_radians(z_phase));
+    vertices.push(x, y, z);
   }
   resizeCanvasToDisplaySize(gl.canvas);
-  side = Math.min(gl.canvas.width, gl.canvas.height);
+  const side = Math.min(gl.canvas.width, gl.canvas.height);
   var vertex_buffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -150,6 +258,16 @@ async function drawLissajous(gl,
   gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(coord);
   gl.viewport(0, 0, side, side);
+  const modelLocation = gl.getUniformLocation(shaderProgram, "model");
+  const viewLocation = gl.getUniformLocation(shaderProgram, "view");
+  const projectionLocation = gl.getUniformLocation(shaderProgram, "projection");
+  const model = identityMatrix();
+  const view = lookAtMatrix(getCameraEye(), [0, 0, 0], [0, 1, 0]);
+  const projection = perspectiveMatrix(degrees_to_radians(50), 1, 0.1, 100);
+  gl.uniformMatrix4fv(modelLocation, false, model);
+  gl.uniformMatrix4fv(viewLocation, false, view);
+  gl.uniformMatrix4fv(projectionLocation, false, projection);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.drawArrays(gl.LINE_STRIP, 0, vertices.length / 3);
 };
 
@@ -180,9 +298,13 @@ window.addEventListener('DOMContentLoaded', function () {
   });
   starting_xf = params.xf || Math.floor(Math.random() * 150) + 1;
   starting_yf = params.yf || Math.floor(Math.random() * 150) + 1;
+  starting_zf = params.zf || Math.floor(Math.random() * 150) + 1;
+  starting_zp = params.zp || 0;
   starting_samples = params.samples || Math.floor(Math.random() * 300) + 10;
   setInput('x_freq', starting_xf);
   setInput('y_freq', starting_yf);
+  setInput('z_freq', starting_zf);
+  setInput('z_phase', starting_zp);
   setInput('samples', starting_samples);
 
   // collapsable buttons
@@ -210,18 +332,19 @@ window.addEventListener('DOMContentLoaded', function () {
     drawLissajous(gl,
                   document.getElementById('x_freq').value,
                   document.getElementById('y_freq').value,
+                  document.getElementById('z_freq').value,
                   document.getElementById('samples').value,
                   document.getElementById('x_phase').value,
-                  document.getElementById('y_phase').value);
+                  document.getElementById('y_phase').value,
+                  document.getElementById('z_phase').value);
   });
 
   function rotate() {
     if (document.querySelector('#animationToggle').checked) {
       var animationSpeed = document.getElementById('animationSpeed').value;
+      let input_id = null;
       if (document.getElementById('radioX').checked) {
         input_id = 'x_phase';
-      } else if (document.getElementById('radioY').checked) {
-        input_id = 'y_phase';
       } else if (document.getElementById('radioXY').checked) {
         var phaseX = document.getElementById('x_phase').value;
         var phaseY = document.getElementById('y_phase').value;
@@ -237,7 +360,10 @@ window.addEventListener('DOMContentLoaded', function () {
         document.getElementById('y_phase').dispatchEvent(new Event('input'));
         options.dispatchEvent(new Event('input'));
         return;
+      } else if (document.getElementById('radioY').checked) {
+        input_id = 'y_phase';
       }
+      if (!input_id) { return; }
       var phase_input = document.getElementById(input_id)
       var phase = phase_input.value;
       phase = Number(phase) + 0.1 * (animationSpeed / 50);
@@ -254,11 +380,21 @@ window.addEventListener('DOMContentLoaded', function () {
   function ondown(e) {
     e.preventDefault();
     isMoving = true;
+    lastPointerX = e.clientX;
+    lastPointerY = e.clientY;
+    if (e.pointerId !== undefined) {
+      drawing.setPointerCapture(e.pointerId);
+    }
   }
 
   function onup(e) {
     e.preventDefault();
     isMoving = false;
+    lastPointerX = null;
+    lastPointerY = null;
+    if (e.pointerId !== undefined) {
+      drawing.releasePointerCapture(e.pointerId);
+    }
   }
 
   function ondbl(e) {
@@ -269,30 +405,24 @@ window.addEventListener('DOMContentLoaded', function () {
   function onmove(e) {
     e.preventDefault();
     if (isMoving) {
-      document.querySelector('#animationToggle').checked = false;
-      var bounds = drawing.getBoundingClientRect();
-      var x = e.clientX - bounds.left;
-      var y = e.clientY - bounds.top;
-      var x_phase = (x / bounds.width) * 360;
-      var y_phase = (y / bounds.height) * 360;
-      setInput('x_phase', x_phase);
-      setInput('y_phase', y_phase);
-      drawLissajous(gl,
-                    document.getElementById('x_freq').value,
-                    document.getElementById('y_freq').value,
-                    document.getElementById('samples').value,
-                    x_phase,
-                    y_phase);
+      if (lastPointerX === null || lastPointerY === null) {
+        lastPointerX = e.clientX;
+        lastPointerY = e.clientY;
+        return;
+      }
+      var dx = e.clientX - lastPointerX;
+      var dy = e.clientY - lastPointerY;
+      lastPointerX = e.clientX;
+      lastPointerY = e.clientY;
+      cameraYaw += dx * cameraOrbitSpeed;
+      cameraPitch = clamp(cameraPitch + dy * cameraOrbitSpeed, -cameraPitchLimit, cameraPitchLimit);
+      options.dispatchEvent(new Event('input'));
     }
   }
 
-  drawing.addEventListener('mousedown', ondown);
   drawing.addEventListener('pointerdown', ondown);
-
-  drawing.addEventListener('mouseup', onup);
   drawing.addEventListener('pointerup', onup);
-
-  drawing.addEventListener('mousemove', onmove);
+  drawing.addEventListener('pointercancel', onup);
   drawing.addEventListener('pointermove', onmove);
 
   drawing.addEventListener('dblclick', ondbl);
