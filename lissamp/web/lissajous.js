@@ -11,7 +11,10 @@ var cameraPitch = Math.asin(initialCameraEye[1] / initialCameraRadius);
 var cameraRadius = initialCameraRadius;
 var lastPointerX = null;
 var lastPointerY = null;
+var lastPointerTime = null;
+var cameraAutoYawSpeed = 0;
 const cameraOrbitSpeed = 0.01;
+const cameraAutoYawScale = 0.1;
 const cameraPitchLimit = degrees_to_radians(85);
 
 function degrees_to_radians(degrees) {
@@ -136,13 +139,53 @@ function oldRandomize() {
 }
 
 function randomize() {
-  document.getElementById('x_freq').value = Math.floor(Math.random() * 150) + 1;
+  const useStructuredRandom = Math.random() < 0.92;
+  let xf;
+  let yf;
+  let zf;
+  let sampleCount;
+
+  if (useStructuredRandom) {
+    const ratioTriples = [
+      [1, 2, 3],
+      [2, 3, 5],
+      [3, 4, 5],
+      [3, 5, 7],
+      [4, 5, 6],
+      [5, 7, 9],
+      [5, 8, 13],
+      [7, 9, 11],
+    ];
+    const ratio = [...ratioTriples[Math.floor(Math.random() * ratioTriples.length)]];
+    ratio.sort(function() { return Math.random() - 0.5; });
+    const maxRatio = Math.max(ratio[0], ratio[1], ratio[2]);
+    const scaleMax = Math.max(1, Math.floor(300 / maxRatio));
+    const scale = Math.floor(Math.random() * scaleMax) + 1;
+    xf = ratio[0] * scale;
+    yf = ratio[1] * scale;
+    zf = ratio[2] * scale;
+    if (Math.random() < 0.8) {
+      // Heavily bias toward lower sample counts for chunkier, alias-rich shapes.
+      sampleCount = Math.floor(10 + Math.pow(Math.random(), 1.8) * 900);
+    } else {
+      // Occasionally render dense curves for contrast.
+      sampleCount = Math.floor(10 + Math.random() * 4990);
+    }
+  } else {
+    // Keep some chance of true unconstrained random values.
+    xf = Math.floor(Math.random() * 300) + 1;
+    yf = Math.floor(Math.random() * 300) + 1;
+    zf = Math.floor(Math.random() * 300) + 1;
+    sampleCount = Math.floor(10 + Math.random() * 4990);
+  }
+
+  document.getElementById('x_freq').value = xf;
   document.getElementById('x_freq').dispatchEvent(new Event('input'));
-  document.getElementById('y_freq').value = Math.floor(Math.random() * 150) + 1;
+  document.getElementById('y_freq').value = yf;
   document.getElementById('y_freq').dispatchEvent(new Event('input'));
-  document.getElementById('z_freq').value = Math.floor(Math.random() * 150) + 1;
+  document.getElementById('z_freq').value = zf;
   document.getElementById('z_freq').dispatchEvent(new Event('input'));
-  document.getElementById('samples').value = Math.floor(Math.random() * 300) + 10;
+  document.getElementById('samples').value = sampleCount;
   document.getElementById('samples').dispatchEvent(new Event('input'));
   document.querySelector('#options').dispatchEvent(new Event('input'));
 }
@@ -342,7 +385,13 @@ window.addEventListener('DOMContentLoaded', function () {
   });
 
   function rotate() {
-    if (document.querySelector('#animationToggle').checked) {
+    const animationEnabled = document.querySelector('#animationToggle').checked;
+    let cameraUpdated = false;
+    if (!isMoving && cameraAutoYawSpeed !== 0) {
+      cameraYaw += cameraAutoYawSpeed;
+      cameraUpdated = true;
+    }
+    if (animationEnabled) {
       var animationSpeed = document.getElementById('animationSpeed').value;
       let input_id = null;
       if (document.getElementById('radioX').checked) {
@@ -375,6 +424,9 @@ window.addEventListener('DOMContentLoaded', function () {
       setInput(input_id, phase)
       options.dispatchEvent(new Event('input'));
     }
+    if (cameraUpdated && !animationEnabled) {
+      options.dispatchEvent(new Event('input'));
+    }
   }
 
   const rotatorInterval = setInterval(rotate, 1000/fps);
@@ -382,8 +434,10 @@ window.addEventListener('DOMContentLoaded', function () {
   function ondown(e) {
     e.preventDefault();
     isMoving = true;
+    cameraAutoYawSpeed = 0;
     lastPointerX = e.clientX;
     lastPointerY = e.clientY;
+    lastPointerTime = e.timeStamp;
     if (e.pointerId !== undefined) {
       drawing.setPointerCapture(e.pointerId);
     }
@@ -394,6 +448,7 @@ window.addEventListener('DOMContentLoaded', function () {
     isMoving = false;
     lastPointerX = null;
     lastPointerY = null;
+    lastPointerTime = null;
     if (e.pointerId !== undefined) {
       drawing.releasePointerCapture(e.pointerId);
     }
@@ -410,13 +465,18 @@ window.addEventListener('DOMContentLoaded', function () {
       if (lastPointerX === null || lastPointerY === null) {
         lastPointerX = e.clientX;
         lastPointerY = e.clientY;
+        lastPointerTime = e.timeStamp;
         return;
       }
       var dx = e.clientX - lastPointerX;
       var dy = e.clientY - lastPointerY;
+      var dtMs = Math.max(e.timeStamp - lastPointerTime, 1);
       lastPointerX = e.clientX;
       lastPointerY = e.clientY;
-      cameraYaw += dx * cameraOrbitSpeed;
+      lastPointerTime = e.timeStamp;
+      var yawStep = dx * cameraOrbitSpeed;
+      cameraYaw += yawStep;
+      cameraAutoYawSpeed = yawStep * (1000 / fps) / dtMs * cameraAutoYawScale;
       cameraPitch = clamp(cameraPitch + dy * cameraOrbitSpeed, -cameraPitchLimit, cameraPitchLimit);
       options.dispatchEvent(new Event('input'));
     }
