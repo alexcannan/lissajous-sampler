@@ -2,3 +2,8 @@ env/
 **.egg-info**
 *.pyc
 *.DS_Store
+
+# cloudflare / static build artifacts
+dist/
+node_modules/
+.wrangler/

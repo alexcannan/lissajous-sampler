@@ -1,0 +1,19 @@
+name = "lissajous-sampler"
+main = "worker.js"
+compatibility_date = "2025-05-01"
+
+# Serve both subdomains from this one Worker. The worker.js picks which
+# directory to serve based on the request hostname.
+routes = [
+  { pattern = "lissajous.space", custom_domain = true },
+  { pattern = "3d.lissajous.space", custom_domain = true },
+]
+
+# Static files built by build.py. The [assets] binding lets the Worker serve
+# them from the edge. run_worker_first makes the Worker run *before* the asset
+# router, so worker.js can rewrite the 3D subdomain onto the /3d/ path. Without
+# it the asset router answers (and 307-redirects) before our code executes.
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+run_worker_first = true

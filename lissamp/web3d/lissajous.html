@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <script>
+      {% include 'lissajous.js' %}
+    </script>
+    <style>
+      {% include 'style.css' %}
+    </style>
+    <title>Lissajous</title>
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22 style=%22background-color:black;%22><line x1=%2250%22 y1=%2250%22 x2=%2297%22 y2=%2297%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2297%22 y1=%2297%22 x2=%2267%22 y2=%2243%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2267%22 y1=%2243%22 x2=%229%22 y2=%222%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%229%22 y1=%222%22 x2=%2217%22 y2=%2261%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2217%22 y1=%2261%22 x2=%2278%22 y2=%2295%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2278%22 y1=%2295%22 x2=%2293%22 y2=%2232%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2293%22 y1=%2232%22 x2=%2238%22 y2=%226%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2238%22 y1=%226%22 x2=%222%22 y2=%2273%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%222%22 y1=%2273%22 x2=%2243%22 y2=%2290%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2243%22 y1=%2290%22 x2=%2295%22 y2=%2221%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2295%22 y1=%2221%22 x2=%2273%22 y2=%2213%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2273%22 y1=%2213%22 x2=%2213%22 y2=%2282%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2213%22 y1=%2282%22 x2=%2213%22 y2=%2282%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2213%22 y1=%2282%22 x2=%2273%22 y2=%2213%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2273%22 y1=%2213%22 x2=%2295%22 y2=%2221%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2295%22 y1=%2221%22 x2=%2243%22 y2=%2290%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2243%22 y1=%2290%22 x2=%222%22 y2=%2273%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%222%22 y1=%2273%22 x2=%2238%22 y2=%226%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2238%22 y1=%226%22 x2=%2293%22 y2=%2232%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2293%22 y1=%2232%22 x2=%2278%22 y2=%2295%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2278%22 y1=%2295%22 x2=%2217%22 y2=%2261%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2217%22 y1=%2261%22 x2=%229%22 y2=%222%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%229%22 y1=%222%22 x2=%2267%22 y2=%2243%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2267%22 y1=%2243%22 x2=%2297%22 y2=%2297%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2297%22 y1=%2297%22 x2=%2250%22 y2=%2249%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2250%22 y1=%2249%22 x2=%222%22 y2=%222%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%222%22 y1=%222%22 x2=%2232%22 y2=%2256%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2232%22 y1=%2256%22 x2=%2290%22 y2=%2297%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2290%22 y1=%2297%22 x2=%2282%22 y2=%2238%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2282%22 y1=%2238%22 x2=%2221%22 y2=%224%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2221%22 y1=%224%22 x2=%226%22 y2=%2267%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%226%22 y1=%2267%22 x2=%2261%22 y2=%2293%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2261%22 y1=%2293%22 x2=%2297%22 y2=%2226%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2297%22 y1=%2226%22 x2=%2256%22 y2=%229%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2256%22 y1=%229%22 x2=%224%22 y2=%2278%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%224%22 y1=%2278%22 x2=%2226%22 y2=%2286%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2226%22 y1=%2286%22 x2=%2286%22 y2=%2217%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2286%22 y1=%2217%22 x2=%2286%22 y2=%2217%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2286%22 y1=%2217%22 x2=%2226%22 y2=%2286%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2226%22 y1=%2286%22 x2=%224%22 y2=%2278%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%224%22 y1=%2278%22 x2=%2256%22 y2=%229%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2256%22 y1=%229%22 x2=%2297%22 y2=%2226%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2297%22 y1=%2226%22 x2=%2261%22 y2=%2293%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2261%22 y1=%2293%22 x2=%226%22 y2=%2267%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%226%22 y1=%2267%22 x2=%2221%22 y2=%224%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2221%22 y1=%224%22 x2=%2282%22 y2=%2238%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2282%22 y1=%2238%22 x2=%2290%22 y2=%2297%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2290%22 y1=%2297%22 x2=%2232%22 y2=%2256%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%2232%22 y1=%2256%22 x2=%222%22 y2=%222%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/><line x1=%222%22 y1=%222%22 x2=%2249%22 y2=%2250%22 stroke=%22white%22 stroke-width=%222%22 opacity=%220.9%22/></svg>'>
+  </head>
+  <body>
+    <script>0</script>  <!-- firefox fix to avoid css races -->
+    <div id="drawing">
+      <canvas id="glcanvas"></canvas>
+    </div>
+    <div id="buttons">
+      <div class="buttonGroup parameters">
+        <div class="buttonContent" id="options">
+          <div class="option">
+            <label><span>X Frequency</span></label>
+            <input type="range" id="x_freq" min="1" max="300" value="10" step="1" oninput="this.nextElementSibling.value = this.value">
+            <input type="number" id="x_freq2" min="1" max="300" value="10" step="1" oninput="this.previousElementSibling.value = this.value">
+          </div>
+          <div class="option">
+            <label><span>Y Frequency</span></label>
+            <input type="range" id="y_freq" min="1" max="300" value="14" step="1" oninput="this.nextElementSibling.value = this.value">
+            <input type="number" id="y_freq2" min="1" max="300" value="14" step="1" oninput="this.previousElementSibling.value = this.value">
+          </div>
+          <div class="option">
+            <label><span>Z Frequency</span></label>
+            <input type="range" id="z_freq" min="1" max="300" value="18" step="1" oninput="this.nextElementSibling.value = this.value">
+            <input type="number" id="z_freq2" min="1" max="300" value="18" step="1" oninput="this.previousElementSibling.value = this.value">
+          </div>
+          <div class="option">
+            <label><span>X Phase</span></label>
+            <input type="range" id="x_phase" min="0" max="360" value="0" step="0.01" oninput="this.nextElementSibling.value = this.value">
+            <input type="number" id="x_phase2" min="0" max="360" value="0" step="0.1" oninput="this.previousElementSibling.value = this.value">
+          </div>
+          <div class="option">
+            <label><span>Y Phase</span></label>
+            <input type="range" id="y_phase" min="0" max="360" value="0" step="0.01" oninput="this.nextElementSibling.value = this.value">
+            <input type="number" id="y_phase2" min="0" max="360" value="0" step="0.1" oninput="this.previousElementSibling.value = this.value">
+          </div>
+          <div class="option">
+            <label><span>Z Phase</span></label>
+            <input type="range" id="z_phase" min="0" max="360" value="0" step="0.01" oninput="this.nextElementSibling.value = this.value">
+            <input type="number" id="z_phase2" min="0" max="360" value="0" step="0.1" oninput="this.previousElementSibling.value = this.value">
+          </div>
+          <div class="option">
+            <label><span>Samples</span></label>
+            <input type="range" id="samples" min="0" max="5000" value="50" step="1" oninput="this.nextElementSibling.value = this.value">
+            <input type="number" id="samples2" min="0" max="5000" value="50" step="1" oninput="this.previousElementSibling.value = this.value">
+          </div>
+        </div>
+        <button id="optionsButton" class="collapsable">⚙️ parameters</button>
+      </div>
+      <div class="buttonGroup animation">
+        <div class="buttonContent" id="animationOptions">
+          <div class="option">
+            <label><span>Animation Speed</span></label>
+            <input type="range" id="animationSpeed" min="1" max="100" value="50" step="1" oninput="this.nextElementSibling.value = this.value">
+            <input type="number" id="animationSpeed2" min="1" max="100" value="50" step="1" oninput="this.previousElementSibling.value = this.value">
+          </div>
+          <div class="option">
+            <label><span>Animation Type</span></label>
+            <!-- TODO: change width of buttons! -->
+            <div id="animationRadio">
+              <input type="radio" id="radioX" name="animationType" value="x" checked>
+              <label for="radioX">X</label>
+              <input type="radio" id="radioXY" name="animationType" value="xy">
+              <label for="radioXY">XY</label>
+              <input type="radio" id="radioY" name="animationType" value="y">
+              <label for="radioY">Y</label>
+            </div>
+          </div>
+          <div class="option">
+            <label><span>Color</span></label>
+            <input type="color" id="animationColor" value="#ffffff">
+          </div>
+          <div class="option">
+            <label><span>Animation Toggle</span></label>
+            <input type="checkbox" id="animationToggle" checked><label for="animationToggle">ô¿ô</label>
+          </div>
+        </div>
+        <button id="animateButton" class="collapsable">🎬 animate</button>
+      </div>
+      <div class="buttonGroup random">
+        <button id="random" onclick="randomize()">🎲 random</button>
+      </div>
+      <div class="buttonGroup fullscreen">
+        <button id="fullscreen" onclick="toggleFullscreen()">📺 fullscreen</button>
+      </div>
+      <div class="buttonGroup share">
+        <span id="copied" style="display:none;">copied to clipboard</span>
+        <button id="share" onclick="copyLink()">⛓️ share</button>
+      </div>
+      <div class="buttonGroup about">
+        <div class="buttonContent" id="about">
+          <p>made by <a target="_blank" href="https://github.com/alexcannan">Alex Cannan</a></p>
+          <p>what are <a target="_blank" href="https://archive.org/details/jstor-25138613">Lissajous curves</a>?</p>
+          <p>what is the <a target="_blank" href="https://web.archive.org/web/20060706192816/http://www.loe.ee.upatras.gr/Comes/Notes/Nyquist.pdf">Nyquist frequency</a>?</p>
+          <p>have any <a target="_blank" href="https://github.com/alexcannan/lissajous-sampler/issues">issues</a>?</p>
+        </div>
+        <button id="aboutButton" class="collapsable">ℹ️ about</button>
+    </div>
+  </body>
+</html>
